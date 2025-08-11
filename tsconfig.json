@@ -7,7 +7,7 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "types": ["node"],
-     "lib": ["esnext"],
+    "lib": ["esnext"],
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
@@ -19,5 +19,8 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false
   }
 }

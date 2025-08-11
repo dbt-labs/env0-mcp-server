@@ -4,7 +4,10 @@
   "type": "module",
   "main": "index.ts",
   "scripts": {
-    "start": "node --loader ts-node/esm index.ts",
+    "build": "tsc",
+    "start": "tsc && node index.js",
+    "start:http": "tsc && node http-server.js",
+    "dev": "nodemon --watch . --ext ts --exec \"npm run build && node http-server.js\"",
     "test": "npm test"
   },
   "author": "Env0",
@@ -16,10 +19,14 @@
   },
   "devDependencies": {
     "@types/node": "^24.2.1",
+    "@types/express": "^5.0.1",
+    "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.2"
+    "@modelcontextprotocol/sdk": "^1.17.2",
+    "express": "^5.1.0",
+    "zod": "^3.22.4"
   }
 }
