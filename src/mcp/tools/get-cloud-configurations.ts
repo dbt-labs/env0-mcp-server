@@ -27,18 +27,26 @@ export function registerGetCloudConfigurationsTool(
         }
 
         const configList = configurations
-          .map(
-            config => `- ID: ${config.id}
-  Name: ${config.name}
-  Type: ${config.type}
-  Organization ID: ${config.organizationId}
-  Is Default: ${config.isDefault ? 'Yes' : 'No'}
-  Status: ${config.status || 'N/A'}
-  Last Test: ${config.lastTestAt || 'N/A'}
-  Last Test Status: ${config.lastTestStatus || 'N/A'}
-  Created: ${config.createdAt}
-  Updated: ${config.updatedAt}`
-          )
+          .map(config => {
+            let serializedConfig = `- ID: ${config.id}
+Name: ${config.name}
+Type: ${config.provider}
+Organization ID: ${config.organizationId}
+Health: ${config.health}
+Date From: ${config.dataFrom}
+Date Until: ${config.dataUntil}
+Earliest History: ${config.earliestHistory}
+Latest History: ${config.latestHistory}`;
+            if (config.lastScan) {
+              serializedConfig += `Last Scan: ${config.lastScan.startedAt} (${config.lastScan.status})\n`;
+            }
+            if (config.lastTest) {
+              serializedConfig += `Last Test Time: ${config.lastTest.testAt}\n`;
+              if (config.lastTest.error)
+                serializedConfig += `Last Test Error: ${config.lastTest.error}`;
+            }
+            return serializedConfig;
+          })
           .join('\n\n');
 
         return {

@@ -46,45 +46,29 @@ To set up the development environment and test the server:
 
 ## Authentication
 
-The env0 MCP server supports two authentication methods. **API Access Token is preferred** when available.
+To allow the MCP server to connect to Env0's platform, you need to provide your API credentials.
+To create a new API key, please follow (this guide)[https://docs.env0.com/docs/api-keys]
 
-### Option 1: API Access Token (Recommended)
-
-Use a pre-generated base64 API Access Token:
-
-```bash
-export ENV0_API_ACCESS_TOKEN="your-base64-encoded-token"
-export ENV0_ORGANIZATION_ID="your-organization-id"
-```
-
-### Option 2: API Key ID and Secret
-
-Use individual API Key components:
+Once you have your API credentials, you can configure them in the MCP server by setting the following environment variables:
 
 ```bash
 export ENV0_API_KEY="your-api-key-id"
 export ENV0_API_SECRET="your-api-key-secret"
+export ENV0_API_ACCESS_TOKEN="your-base64-encoded-token"
 export ENV0_ORGANIZATION_ID="your-organization-id"
 ```
 
-### Generating an API Access Token
+You can also create a `.env` file like our example `.env.example` and fill in the values:
 
-If you have an API Key ID and Secret, you can generate an API Access Token using:
+```dotenv
+# Required: Your env0 API Key ID (Get this from the Env0 site using the guide above)
+ENV0_API_KEY=your-api-key-id-here
 
-```bash
-echo -n "YOUR_API_KEY_ID:YOUR_API_KEY_SECRET" | base64
+# Required: Your env0 API Key Secret (Get this from the Env0 site using the guide above)
+ENV0_API_SECRET=your-api-key-secret-here
+
+ENV0_API_ACCESS_TOKEN="your-base64-encoded-token"
+
+# Your env0 Organization ID (found in your env0 organization settings). This is required if you have multiple organizations
+ENV0_ORGANIZATION_ID=your-organization-id-here
 ```
-
-### Getting Your Credentials
-
-1. **Organization API Keys**: Go to your env0 organization settings → API Keys tab → Add API Key
-2. **Personal API Keys**: Click your avatar → Personal Settings → API Keys tab → Add API Key
-
-For more details, see the [env0 API Authentication Documentation](https://docs.env0.com/reference/authentication).
-
-### Environment Variables
-
-You can also set an optional custom API URL:
-
-```bash
-export ENV0_API_URL="https://api.env0.com"  # Default value

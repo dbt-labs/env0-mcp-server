@@ -1,5 +1,5 @@
 import type Env0Client from './env0-client';
-import type { Env0CloudConfiguration } from './models/cloud-configuration';
+import type { CloudConfiguration } from './models/cloud-configuration';
 
 export class Env0Service {
   constructor(
@@ -7,8 +7,8 @@ export class Env0Service {
     private readonly env0Client: Env0Client
   ) {}
 
-  async getCloudConfigurations(): Promise<Env0CloudConfiguration[]> {
-    return this.env0Client.request<Env0CloudConfiguration[]>(
+  async getCloudConfigurations(): Promise<CloudConfiguration[]> {
+    return this.env0Client.request<CloudConfiguration[]>(
       `/cloud/configurations?organizationId=${this.config.organizationId}`
     );
   }
