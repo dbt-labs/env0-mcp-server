@@ -35,59 +35,11 @@ export function registerGetEnvironmentsTool(server: McpServer, env0Service: Env0
           };
         }
 
-        const environmentList = environments
-          .map(env => {
-            let serializedEnv = `- ID: ${env.id}
-Name: ${env.name}
-Organization ID: ${env.organizationId}
-Project ID: ${env.projectId}
-User ID: ${env.userId}
-Workspace: ${env.workspaceName}
-Status: ${env.status}
-Requires Approval: ${env.requiresApproval}
-Continuous Deployment: ${env.continuousDeployment}
-Pull Request Plan Deployments: ${env.pullRequestPlanDeployments}
-Auto Deploy On Path Changes Only: ${env.autoDeployOnPathChangesOnly}
-Is Remote Backend: ${env.isRemoteBackend}
-Is Locked: ${env.isLocked}
-Drift Status: ${env.driftStatus}
-Is Archived: ${env.isArchived}
-Marked For Auto Destroy: ${env.markedForAutoDestroy}`;
-
-            if (env.user.name) {
-              serializedEnv += `\nUser: ${env.user.name} (${env.user.email})`;
-            }
-
-            if (env.latestDeploymentLog) {
-              serializedEnv += `\nLatest Deployment: ${env.latestDeploymentLog.type} - ${env.latestDeploymentLog.status}`;
-              if (env.latestDeploymentLog.startedAt) {
-                serializedEnv += ` (Started: ${env.latestDeploymentLog.startedAt})`;
-              }
-            }
-
-            if (env.lifespanEndAt) {
-              serializedEnv += `\nLifespan Ends: ${env.lifespanEndAt}`;
-            }
-
-            if (env.nextScheduledDates.deploy) {
-              serializedEnv += `\nNext Deploy: ${env.nextScheduledDates.deploy}`;
-            }
-
-            if (env.nextScheduledDates.destroy) {
-              serializedEnv += `\nNext Destroy: ${env.nextScheduledDates.destroy}`;
-            }
-
-            return serializedEnv;
-          })
-          .join('\n\n');
-
         return {
           content: [
             {
               type: 'text',
-              text: `Environments (${environments.length} found):
-
-${environmentList}`,
+              text: `Environments (${environments.length} found): ${JSON.stringify(environments)}`,
             },
           ],
         };

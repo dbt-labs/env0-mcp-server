@@ -26,37 +26,11 @@ export function registerGetCloudConfigurationsTool(
           };
         }
 
-        const configList = configurations
-          .map(config => {
-            let serializedConfig = `- ID: ${config.id}
-Name: ${config.name}
-Type: ${config.provider}
-Organization ID: ${config.organizationId}
-Cloud ID: ${config.cloudId}
-Health: ${config.health}
-Date From: ${config.dataFrom}
-Date Until: ${config.dataUntil}
-Earliest History: ${config.earliestHistory}
-Latest History: ${config.latestHistory}`;
-            if (config.lastScan) {
-              serializedConfig += `Last Scan: ${config.lastScan.startedAt} (${config.lastScan.status})\n`;
-            }
-            if (config.lastTest) {
-              serializedConfig += `Last Test Time: ${config.lastTest.testAt}\n`;
-              if (config.lastTest.error)
-                serializedConfig += `Last Test Error: ${config.lastTest.error}`;
-            }
-            return serializedConfig;
-          })
-          .join('\n\n');
-
         return {
           content: [
             {
               type: 'text',
-              text: `Cloud Configurations (${configurations.length} found):
-
-${configList}`,
+              text: `Cloud Configurations (${configurations.length} found): ${JSON.stringify(configurations)}`,
             },
           ],
         };
