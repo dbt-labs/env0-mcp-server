@@ -21,9 +21,9 @@ export class Env0Client {
       headers: {
         Authorization: authHeader,
         'Content-Type': 'application/json',
-        Accept: 'application/json',
+        Accept: 'application/json'
       },
-      timeout: 30000, // 30 second timeout
+      timeout: 30000 // 30 second timeout
     });
 
     this.client.interceptors.response.use(
@@ -46,7 +46,7 @@ export class Env0Client {
                 'Rate limit exceeded. Too many requests have been made to the env0 API. Please wait before making additional requests.';
               break;
             default:
-              message = `Request failed with status ${status}: ${error.response.data?.message || error.message}`;
+              message = `Request failed with status ${status}: ${error.response.data}`;
           }
 
           error.message = message;

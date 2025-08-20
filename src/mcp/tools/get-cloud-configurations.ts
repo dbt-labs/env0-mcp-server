@@ -9,7 +9,7 @@ export function registerGetCloudConfigurationsTool(
     'get-cloud-configurations',
     {
       title: 'Get Cloud Configurations',
-      description: 'Get the compass cloud configurations',
+      description: 'Get the compass cloud configurations'
     },
     async () => {
       try {
@@ -20,55 +20,29 @@ export function registerGetCloudConfigurationsTool(
             content: [
               {
                 type: 'text',
-                text: 'No cloud configurations found.',
-              },
-            ],
+                text: 'No cloud configurations found.'
+              }
+            ]
           };
         }
-
-        const configList = configurations
-          .map(config => {
-            let serializedConfig = `- ID: ${config.id}
-Name: ${config.name}
-Type: ${config.provider}
-Organization ID: ${config.organizationId}
-Cloud ID: ${config.cloudId}
-Health: ${config.health}
-Date From: ${config.dataFrom}
-Date Until: ${config.dataUntil}
-Earliest History: ${config.earliestHistory}
-Latest History: ${config.latestHistory}`;
-            if (config.lastScan) {
-              serializedConfig += `Last Scan: ${config.lastScan.startedAt} (${config.lastScan.status})\n`;
-            }
-            if (config.lastTest) {
-              serializedConfig += `Last Test Time: ${config.lastTest.testAt}\n`;
-              if (config.lastTest.error)
-                serializedConfig += `Last Test Error: ${config.lastTest.error}`;
-            }
-            return serializedConfig;
-          })
-          .join('\n\n');
 
         return {
           content: [
             {
               type: 'text',
-              text: `Cloud Configurations (${configurations.length} found):
-
-${configList}`,
-            },
-          ],
+              text: `Cloud Configurations (${configurations.length} found): ${JSON.stringify(configurations)}`
+            }
+          ]
         };
       } catch (error) {
         return {
           content: [
             {
               type: 'text',
-              text: `Error fetching cloud configurations: ${error instanceof Error ? error.message : 'Unknown error'}`,
-            },
+              text: `Error fetching cloud configurations: ${error instanceof Error ? error.message : 'Unknown error'}`
+            }
           ],
-          isError: true,
+          isError: true
         };
       }
     }
