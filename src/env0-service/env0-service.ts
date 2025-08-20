@@ -1,7 +1,6 @@
 import type { Env0Config } from './env0-client';
 import type Env0Client from './env0-client';
 import type { CloudConfiguration } from './models/cloud-configuration';
-import type { Environment } from './models/environment';
 
 export interface GetEnvironmentsParams {
   projectId: string | undefined;
@@ -26,8 +25,8 @@ export class Env0Service {
     });
   }
 
-  async getEnvironments(environmentParams: GetEnvironmentsParams): Promise<Environment[]> {
-    return this.env0Client.request<Environment[]>({
+  async getEnvironments(environmentParams: GetEnvironmentsParams): Promise<object[]> {
+    return this.env0Client.request({
       url: '/mcp/environments',
       params: {
         organizationId: this.config.organizationId || undefined,
