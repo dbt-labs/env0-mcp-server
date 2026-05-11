@@ -1,5 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { registerGetCloudConfigurationsTool } from './tools/get-cloud-configurations';
+import { registerGetDeploymentsTool } from './tools/get-deployments';
 import { registerGetEnvironmentsTool } from './tools/get-environments';
 import { Env0Service } from '../env0-service/env0-service';
 import { registerGetProjectsTool } from './tools/get-projects';
@@ -20,6 +21,7 @@ export function createMcpServer(env0Service: Env0Service): McpServer {
   });
 
   registerGetCloudConfigurationsTool(server, env0Service);
+  registerGetDeploymentsTool(server, env0Service);
   registerGetEnvironmentsTool(server, env0Service);
   registerGetProjectsTool(server, env0Service);
   registerApproveEnvironmentTool(server, env0Service);

@@ -3,6 +3,7 @@ import type { ApproveEnvironmentParams } from '../mcp/schemas/approve-environmen
 import type { CancelEnvironmentParams } from '../mcp/schemas/cancel-environment-schema';
 import type { DeployEnvironmentParams } from '../mcp/schemas/deploy-environment-schema';
 import type { GetEnvironmentsParams } from '../mcp/schemas/get-environments-params-schema';
+import type { GetDeploymentsParams } from '../mcp/schemas/get-deployments-params-schema';
 import type { Env0Config } from './env0-client';
 import type Env0Client from './env0-client';
 import type { CloudConfiguration } from './models/cloud-configuration';
@@ -67,10 +68,45 @@ export class Env0Service {
     });
   }
 
-  async getErrorAnalysis(environmentId: string): Promise<object> {
+  async getDeployments(params: GetDeploymentsParams): Promise<object[]> {
     return this.env0Client.request({
-      url: `/mcp/environments/${environmentId}/error-analysis`
+      url: `/environments/${params.environmentId}/deployments`,
+      params: {
+        limit: params.limit || undefined,
+        offset: params.offset || undefined,
+        statuses: params.statuses || undefined
+      }
     });
+  }
+
+  async getDeploymentSteps(deploymentId: string): Promise<object[]> {
+    return this.env0Client.request({
+      url: `/deployments/${deploymentId}/steps`
+    });
+  }
+
+  async getDeploymentStepLog(deploymentId: string, stepName: string): Promise<object> {
+    return this.env0Client.request({
+      url: `/deployments/${deploymentId}/steps/${encodeURIComponent(stepName)}/log`
+    });
+  }
+
+  async getErrorAnalysis(environmentId: string, deploymentId?: string): Promise<object> {
+    if (!deploymentId) {
+      return this.env0Client.request({
+        url: `/mcp/environments/${environmentId}/error-analysis`
+      });
+    }
+
+    try {
+      return await this.env0Client.request({
+        url: `/deployments/${deploymentId}/error-analysis`
+      });
+    } catch {
+      return this.env0Client.request({
+        url: `/mcp/environments/${environmentId}/error-analysis`
+      });
+    }
   }
 
   async approveEnvironment({ environmentId }: ApproveEnvironmentParams): Promise<object> {
@@ -128,9 +164,25 @@ export class Env0Service {
     });
   }
 
-  async getPlanLogs({ environmentId }: GetPlanLogsParams): Promise<object> {
-    return this.env0Client.request({
-      url: `/mcp/environments/${environmentId}/plan/logs`
-    });
+  async getPlanLogs({ environmentId, deploymentId }: GetPlanLogsParams): Promise<object> {
+    if (!deploymentId) {
+      return this.env0Client.request({
+        url: `/mcp/environments/${environmentId}/plan/logs`
+      });
+    }
+
+    const steps = await this.getDeploymentSteps(deploymentId);
+    const planStep = (steps as { name: string }[]).find(
+      s => s.name.toLowerCase() === 'plan' || s.name.toLowerCase().includes('plan')
+    );
+
+    if (!planStep) {
+      return {
+        error: 'No plan step found for this deployment',
+        availableSteps: (steps as { name: string }[]).map(s => s.name)
+      };
+    }
+
+    return this.getDeploymentStepLog(deploymentId, planStep.name);
   }
 }

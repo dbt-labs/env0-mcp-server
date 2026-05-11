@@ -11,7 +11,9 @@ export function registerGetPlanLogsTool(server: McpServer, env0Service: Env0Serv
     {
       title: 'Get Plan Logs',
       description:
-        'Get plan logs for a specific environment from env0, for full plan please see env0 console',
+        'Get plan logs for a specific environment from env0. ' +
+        'Optionally specify a deploymentId to get logs for a specific historical deployment. ' +
+        'Use get-deployments to find deployment IDs. If omitted, returns logs for the latest deployment.',
       inputSchema: GetPlanLogsParamsSchema.shape
     },
     async (params: GetPlanLogsParams) => {
