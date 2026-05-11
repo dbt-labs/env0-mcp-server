@@ -86,9 +86,29 @@ export class Env0Service {
   }
 
   async getDeploymentStepLog(deploymentId: string, stepName: string): Promise<object> {
-    return this.env0Client.request({
-      url: `/deployments/${deploymentId}/steps/${encodeURIComponent(stepName)}/log`
-    });
+    const allEvents: object[] = [];
+    let nextStartTime: string | undefined;
+    let hasMore = true;
+
+    while (hasMore) {
+      const page = await this.env0Client.request<{
+        events: object[];
+        nextStartTime?: string;
+        hasMoreLogs?: boolean;
+      }>({
+        url: `/deployments/${deploymentId}/steps/${encodeURIComponent(stepName)}/log`,
+        params: nextStartTime ? { startTime: nextStartTime } : undefined
+      });
+
+      if (page.events) {
+        allEvents.push(...page.events);
+      }
+
+      hasMore = page.hasMoreLogs === true;
+      nextStartTime = page.nextStartTime;
+    }
+
+    return { events: allEvents, totalEvents: allEvents.length };
   }
 
   async getErrorAnalysis(environmentId: string, deploymentId?: string): Promise<object> {
@@ -165,13 +185,18 @@ export class Env0Service {
   }
 
   async getPlanLogs({ environmentId, deploymentId }: GetPlanLogsParams): Promise<object> {
-    if (!deploymentId) {
-      return this.env0Client.request({
-        url: `/mcp/environments/${environmentId}/plan/logs`
-      });
+    let resolvedDeploymentId = deploymentId;
+
+    if (!resolvedDeploymentId) {
+      const env = await this.getEnvironment(environmentId);
+      const latestId = (env as { latestDeploymentLogId?: string }).latestDeploymentLogId;
+      if (!latestId) {
+        return { error: 'No deployments found for this environment' };
+      }
+      resolvedDeploymentId = latestId;
     }
 
-    const steps = await this.getDeploymentSteps(deploymentId);
+    const steps = await this.getDeploymentSteps(resolvedDeploymentId);
     const planStep = (steps as { name: string }[]).find(
       s => s.name.toLowerCase() === 'plan' || s.name.toLowerCase().includes('plan')
     );
@@ -183,6 +208,6 @@ export class Env0Service {
       };
     }
 
-    return this.getDeploymentStepLog(deploymentId, planStep.name);
+    return this.getDeploymentStepLog(resolvedDeploymentId, planStep.name);
   }
 }
