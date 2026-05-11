@@ -10,12 +10,15 @@ export function registerGetErrorAnalysisTool(server: McpServer, env0Service: Env
     'get-error-analysis',
     {
       title: 'Get Error Analysis',
-      description: `Analyzes errors in the last environment's deployment`,
+      description:
+        "Analyzes errors in an environment's deployment. " +
+        'Optionally specify a deploymentId to analyze a specific historical deployment. ' +
+        'Use get-deployments to find deployment IDs. If omitted, analyzes the latest deployment.',
       inputSchema: GetErrorAnalysisSchema.shape
     },
-    async ({ environmentId }: GetErrorAnalysisParams) => {
+    async ({ environmentId, deploymentId }: GetErrorAnalysisParams) => {
       try {
-        const errorAnalysis = await env0Service.getErrorAnalysis(environmentId);
+        const errorAnalysis = await env0Service.getErrorAnalysis(environmentId, deploymentId);
 
         return {
           content: [
