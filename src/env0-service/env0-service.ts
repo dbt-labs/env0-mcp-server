@@ -184,7 +184,10 @@ export class Env0Service {
     });
   }
 
-  async getPlanLogs({ environmentId, deploymentId }: GetPlanLogsParams): Promise<object> {
+  async getPlanLogs({ environmentId, deploymentId, tail }: GetPlanLogsParams): Promise<object> {
+    const defaultTail = 150;
+    const tailCount = tail ?? defaultTail;
+
     let resolvedDeploymentId = deploymentId;
 
     if (!resolvedDeploymentId) {
@@ -208,6 +211,20 @@ export class Env0Service {
       };
     }
 
-    return this.getDeploymentStepLog(resolvedDeploymentId, planStep.name);
+    const fullLog = (await this.getDeploymentStepLog(resolvedDeploymentId, planStep.name)) as {
+      events: object[];
+      totalEvents: number;
+    };
+
+    if (fullLog.totalEvents <= tailCount) {
+      return fullLog;
+    }
+
+    return {
+      events: fullLog.events.slice(-tailCount),
+      totalEvents: fullLog.totalEvents,
+      truncated: true,
+      showing: `last ${tailCount} of ${fullLog.totalEvents} events (pass a higher tail value to see more)`
+    };
   }
 }

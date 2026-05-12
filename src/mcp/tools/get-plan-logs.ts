@@ -12,8 +12,9 @@ export function registerGetPlanLogsTool(server: McpServer, env0Service: Env0Serv
       title: 'Get Plan Logs',
       description:
         'Get plan logs for a specific environment from env0. ' +
-        'Optionally specify a deploymentId to get logs for a specific historical deployment. ' +
-        'Use get-deployments to find deployment IDs. If omitted, returns logs for the latest deployment.',
+        'Returns the last 150 log events by default (plan summary is always at the end). ' +
+        'Set tail to a higher value to see more context (e.g. moved blocks, full refresh output). ' +
+        'Optionally specify a deploymentId for a specific historical deployment (use get-deployments to find IDs).',
       inputSchema: GetPlanLogsParamsSchema.shape
     },
     async (params: GetPlanLogsParams) => {

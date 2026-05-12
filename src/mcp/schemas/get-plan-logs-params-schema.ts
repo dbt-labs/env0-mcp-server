@@ -7,6 +7,16 @@ export const GetPlanLogsParamsSchema = z.object({
     .optional()
     .describe(
       'The ID of a specific deployment to get plan logs for. If omitted, returns logs for the latest deployment.'
+    ),
+  tail: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe(
+      'Return only the last N log events (the plan summary is always at the end). ' +
+        'Defaults to 150. Set higher to see more context, e.g. moved blocks or full refresh output. ' +
+        'Use get-deployment-steps to see all available steps if you need init or apply logs.'
     )
 });
 
