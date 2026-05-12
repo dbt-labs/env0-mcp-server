@@ -1,0 +1,31 @@
+# Runlayer Deployment Configuration
+# Deployment ID: 7a867761-29af-4722-b285-1ebd095582b8
+id: 7a867761-29af-4722-b285-1ebd095582b8
+
+name: env0-mcp-server
+
+runtime: docker
+
+build:
+  dockerfile: Dockerfile
+  context: .
+  platform: arm  # Options: x86 or arm
+  target: null   # Optional: target build stage for multi-stage Dockerfiles
+  args: {}
+
+service:
+  port: 3000
+  path: /mcp
+  expose: []
+
+infrastructure:
+  cpu: 256
+  memory: 512
+  platform: arm
+  enable_db: false
+
+env:
+  MCP_TRANSPORT: "http"
+  ENV0_API_KEY: "${ENV0_API_KEY}"
+  ENV0_API_SECRET: "${ENV0_API_SECRET}"
+  ENV0_ORGANIZATION_ID: "${ENV0_ORGANIZATION_ID}"
