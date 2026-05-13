@@ -12,8 +12,9 @@ export function registerGetPlanLogsTool(server: McpServer, env0Service: Env0Serv
       title: 'Get Plan Logs',
       description:
         'Get plan logs for a specific environment from env0. ' +
-        'Returns the last 150 log events by default (plan summary is always at the end). ' +
+        'Returns the last 50 log events by default (plan summary is always at the end). ' +
         'Set tail to a higher value to see more context (e.g. moved blocks, full refresh output). ' +
+        'When truncated, a planSummary field is included in the response so you can assess scope before fetching more. ' +
         'Optionally specify a deploymentId for a specific historical deployment (use get-deployments to find IDs).',
       inputSchema: GetPlanLogsParamsSchema.shape
     },

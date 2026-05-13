@@ -15,7 +15,7 @@ export const GetPlanLogsParamsSchema = z.object({
     .optional()
     .describe(
       'Return only the last N log events (the plan summary is always at the end). ' +
-        'Defaults to 150. Set higher to see more context, e.g. moved blocks or full refresh output. ' +
+        'Defaults to 50. Set higher to see more context, e.g. moved blocks or full refresh output. ' +
         'Use get-deployment-steps to see all available steps if you need init or apply logs.'
     )
 });
