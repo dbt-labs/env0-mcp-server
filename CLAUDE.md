@@ -30,6 +30,24 @@ There are two places tool descriptions live in the source:
 
 Both must stay consistent with each other, and both propagate to Runlayer only after a redeploy.
 
+### Docker cache gotcha
+
+The Runlayer CLI uses `docker build` internally and does not expose `--no-cache`. Docker's layer cache for `COPY . .` persists even after `docker builder prune --all` — intermediate layers are stored as image layers, not just in the builder cache.
+
+If you deploy and the tool descriptions don't change, the image was likely built from a cached layer with stale source:
+1. Modify any file in the build context (e.g. `echo "// bust" >> src/mcp/tools/get-plan-logs.ts`)
+2. Redeploy with `uvx runlayer deploy -c runlayer.yaml -e .env`
+3. Clean up the throwaway change after the deploy
+4. Wait ~30-45s after deploy for the ECS task to roll over before verifying via `list_server_tools`
+
+### Upstream contribution checklist
+
+When cherry-picking fork commits onto an upstream PR branch:
+1. Audit the diff for any dbt Labs-specific data (account IDs, deployment IDs, org IDs, internal URLs, Slack channels)
+2. Remove internal implementation comments (e.g. `// Change 3:`) — keep only comments that explain *why*
+3. Verify `CLAUDE.md`, `runlayer.yaml`, `.env`, `.tool-versions` are not in the diff
+4. Ensure changes work generically for any env0 customer, not just our deployment
+
 ## Remotes
 
 | Remote | Repo | Purpose |
