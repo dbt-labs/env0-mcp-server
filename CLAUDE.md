@@ -2,14 +2,19 @@
 
 This is the dbt Labs fork of `env0/mcp-server`, deployed to Runlayer as a hosted MCP server.
 
-## Upstream PR policy
+## Upstream PR policy (CRITICAL)
 
-This file exists only in the dbt Labs fork (`dbt-labs/env0-mcp-server`). It must **never** be included in PRs to the upstream repo (`env0/mcp-server`).
+This file exists only in the dbt Labs fork (`dbt-labs/env0-mcp-server`). It must **never** appear in PRs to the upstream repo (`env0/mcp-server`).
 
 When creating upstream PRs:
 1. Branch from `upstream/main`, not `origin/main`
 2. Cherry-pick or rebase only the commits relevant to the contribution
 3. Verify `CLAUDE.md` is not in the diff before opening the PR
+4. **Always pass `--repo dbt-labs/env0-mcp-server`** when running `gh pr create` — without it, `gh` defaults to the upstream `env0/mcp-server` remote and the PR lands on the public repo
+
+Files that must never reach upstream:
+- `CLAUDE.md`
+- `.claude/` (if added later)
 
 ## Runlayer deployment sync
 
