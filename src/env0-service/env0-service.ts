@@ -12,6 +12,7 @@ import type { GetCloudResourcesParams } from '../mcp/schemas/get-cloud-resources
 import type { GetPlanLogsParams } from '../mcp/schemas/get-plan-logs-params-schema';
 import type { GenerateIaCParams } from '../mcp/schemas/generate-iac-schema';
 import type { CheckIaCJobStatusParams } from '../mcp/schemas/check-iac-job-status-schema';
+import { stripAnsi } from '../common/ansi';
 
 export class Env0Service {
   private readonly config: Env0Config;
@@ -185,18 +186,25 @@ export class Env0Service {
   }
 
   async getPlanLogs({ environmentId, deploymentId, tail }: GetPlanLogsParams): Promise<object> {
-    const defaultTail = 150;
+    const defaultTail = 50;
     const tailCount = tail ?? defaultTail;
 
     let resolvedDeploymentId = deploymentId;
+    let planSummary: unknown = undefined;
 
     if (!resolvedDeploymentId) {
       const env = await this.getEnvironment(environmentId);
-      const latestId = (env as { latestDeploymentLogId?: string }).latestDeploymentLogId;
+      const envAny = env as Record<string, unknown>;
+      const latestId = envAny.latestDeploymentLogId as string | undefined;
       if (!latestId) {
         return { error: 'No deployments found for this environment' };
       }
       resolvedDeploymentId = latestId;
+      // Grab planSummary from the environment's latest deployment log if available
+      const latestLog = envAny.latestDeploymentLog as Record<string, unknown> | undefined;
+      if (latestLog?.planSummary) {
+        planSummary = latestLog.planSummary;
+      }
     }
 
     const steps = await this.getDeploymentSteps(resolvedDeploymentId);
@@ -212,19 +220,33 @@ export class Env0Service {
     }
 
     const fullLog = (await this.getDeploymentStepLog(resolvedDeploymentId, planStep.name)) as {
-      events: object[];
+      events: { message?: string }[];
       totalEvents: number;
     };
 
+    // Strip ANSI escape codes from all event messages
+    const cleanedEvents = fullLog.events.map(event => {
+      if (typeof event.message === 'string') {
+        return { ...event, message: stripAnsi(event.message) };
+      }
+      return event;
+    });
+
     if (fullLog.totalEvents <= tailCount) {
-      return fullLog;
+      return { events: cleanedEvents, totalEvents: fullLog.totalEvents };
     }
 
-    return {
-      events: fullLog.events.slice(-tailCount),
+    const result: Record<string, unknown> = {
+      events: cleanedEvents.slice(-tailCount),
       totalEvents: fullLog.totalEvents,
       truncated: true,
       showing: `last ${tailCount} of ${fullLog.totalEvents} events (pass a higher tail value to see more)`
     };
+
+    if (planSummary !== undefined) {
+      result.planSummary = planSummary;
+    }
+
+    return result;
   }
 }
